@@ -1,15 +1,5 @@
 <?php
-/**
- * Plugin Name: CDF Donation Form with PayPal and Stripe
- * Plugin URI:  https://github.com/razuahammad55/cdf-donation-form-with-paypal-and-stripe
- * Description: A secure, modular WordPress donation plugin supporting Stripe Checkout and PayPal REST API for One-Time and Monthly Recurring donations.
- * Version:     1.4.0
- * Author:      Razu Ahammad
- * Author URI:  https://profiles.wordpress.org/razuahammad/
- * License:     GPLv2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: cdf-donation-form-with-paypal-and-stripe
- */
+
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
