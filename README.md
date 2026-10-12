@@ -23,9 +23,9 @@ A secure, lightweight, and modular WordPress fundraising plugin that integrates 
 ## 📂 File & Directory Architecture
 
 ```text
-cdf-donation-form-paypal-stripe/
+cdf-donation-form-with-paypal-and-stripe/
 │
-├── cdf-donation-form-paypal-stripe.php    # Main Plugin File, Activation Hooks & Dynamic CSS Generator
+├── cdf-donation-form-with-paypal-and-stripe.php    # Main Plugin File, Activation Hooks & Dynamic CSS Generator
 ├── readme.txt                          # Official WordPress.org Repository Metadata
 ├── README.md                           # GitHub Project Documentation
 │
