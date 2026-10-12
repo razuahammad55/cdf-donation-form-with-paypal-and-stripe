@@ -18,15 +18,10 @@ Accept secure payments directly on your website using **Stripe Checkout** (Credi
 
 ### Key Features
 - **Dual Payment Gateways:** Seamlessly supports both Stripe Checkout and PayPal REST API.
-
 - **Flexible Frequencies:** Handle single **One-Time** donations or automated **Monthly Recurring Subscriptions**.
-
 - **Elementor-Style Custom Styling:** Modern admin UI allowing you to customize button colors, hover/active states, and global border radius using live color pickers with hex code support.
-
 - **Built-In Analytics Dashboard:** Track total revenue, gateway comparisons (Stripe vs. PayPal), and subscription breakdowns right inside your WordPress dashboard.
-
 - **Automated Receipts & Emails:** Instantly dispatch automated HTML thank-you emails to donors and notification summaries to site administrators.
-
 - **Custom Post Type Tracking:** Every successful transaction is securely logged as a custom post type (`donation`) complete with metadata like serial numbers, gateway mode, and transaction IDs.
 
 
