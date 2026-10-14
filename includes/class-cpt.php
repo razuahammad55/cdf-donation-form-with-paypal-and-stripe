@@ -1,5 +1,4 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -97,48 +96,42 @@ function cdf_render_donation_details_metabox( $post ) {
     $transaction_id = get_post_meta( $post->ID, '_donation_transaction_id', true );
     $serial_number  = get_post_meta( $post->ID, '_donation_serial_number', true );
     ?>
-    <style>
-        .cdf-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .cdf-detail-card { background: #f9f9f9; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 6px; }
-        .cdf-detail-card strong { display: block; font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; }
-        .cdf-detail-card span { font-size: 15px; font-weight: 600; color: #1e293b; }
-    </style>
     <div class="cdf-details-grid">
         <div class="cdf-detail-card">
-            <strong>Serial Number</strong>
+            <strong><?php esc_html_e( 'Serial Number', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span>#<?php echo esc_html( $serial_number ? $serial_number : $post->ID ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>Donation Amount</strong>
+            <strong><?php esc_html_e( 'Donation Amount', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span>$<?php echo esc_html( number_format( floatval( $amount ), 2 ) ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>First Name</strong>
+            <strong><?php esc_html_e( 'First Name', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span><?php echo esc_html( $first_name ?: '—' ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>Last Name</strong>
+            <strong><?php esc_html_e( 'Last Name', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span><?php echo esc_html( $last_name ?: '—' ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>Email Address</strong>
+            <strong><?php esc_html_e( 'Email Address', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span><?php echo esc_html( $email ?: '—' ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>Payment Gateway</strong>
+            <strong><?php esc_html_e( 'Payment Gateway', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span><?php echo esc_html( $gateway ?: '—' ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>Frequency</strong>
+            <strong><?php esc_html_e( 'Frequency', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span><?php echo esc_html( $frequency ?: '—' ); ?></span>
         </div>
         <div class="cdf-detail-card">
-            <strong>Environment</strong>
+            <strong><?php esc_html_e( 'Environment', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
             <span><?php echo esc_html( $environment ?: '—' ); ?></span>
         </div>
         <div class="cdf-detail-card" style="grid-column: span 2;">
-            <strong>Transaction / Order ID</strong>
-            <span style="font-family: monospace; font-size: 13px;"><?php echo esc_html( $transaction_id ?: '—' ); ?></span>
+            <strong><?php esc_html_e( 'Transaction / Order ID', 'cdf-donation-form-with-paypal-and-stripe' ); ?></strong>
+            <span style="font-family: monospace; font-size: 13px; word-break: break-all;"><?php echo esc_html( $transaction_id ?: '—' ); ?></span>
         </div>
     </div>
     <?php
