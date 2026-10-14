@@ -1,104 +1,140 @@
-/* ===========================
-   CDF PLUGIN ADMIN STYLES
-   ============================ */
+/**
+ * Plugin Name: CDF Donation Form with PayPal and Stripe
+ * Description: Admin Stylesheet for Version 2.0.0
+ * Author: Razu Ahammad
+ */
 
-.cdf-admin-wrap {
-    margin-right: 20px;
+/* Full-width fix: override WP wrap limitation */
+.wrap.cdf-admin-wrap, 
+div.wrap > .cdf-admin-wrap {
+    max-width: 100% !important;
+    margin-right: 25px !important;
 }
 
-.cdf-admin-wrap h1 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 8px;
+.cdf-admin-wrap {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .cdf-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 24px;
+    border-radius: 10px;
+    padding: 25px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.cdf-metric-box {
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.form-table th {
-    font-weight: 600;
-    color: #334155;
-    width: 240px;
-}
-
-.form-table td input[type="text"],
-.form-table td input[type="password"],
-.form-table td select {
-    border-color: #cbd5e1;
-    border-radius: 6px;
-    padding: 8px 12px;
-    width: 100%;
-    max-width: 450px;
-}
-
-.form-table td input[type="color"] {
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    width: 60px;
-    height: 38px;
-    cursor: pointer;
-    vertical-align: middle;
-    background: #fff;
-    padding: 2px;
-}
-
-/* Elementor Style Tabs */
-.cdf-style-tabs {
-    display: flex;
-    gap: 8px;
     margin-bottom: 20px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 12px;
+    box-sizing: border-box;
 }
 
-.cdf-tab-btn {
-    background: #f1f5f9;
-    color: #475569;
-    border: none;
-    padding: 10px 18px;
-    font-size: 14px;
+.cdf-card h2, 
+.cdf-card h3 {
+    color: #1e293b;
+    margin-top: 0;
+}
+
+/* Professional Premium Switcher */
+.cdf-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    vertical-align: middle;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.cdf-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cdf-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s;
+    border-radius: 28px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cdf-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cdf-switch input:checked + .cdf-slider {
+    background-color: #2563eb;
+}
+
+.cdf-switch input:checked + .cdf-slider:before {
+    transform: translateX(24px);
+}
+
+.cdf-code-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 10px 14px;
+    font-family: monospace;
     font-weight: 600;
     border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    color: #0f172a;
+    margin: 8px 0;
+    display: inline-block;
 }
 
-.cdf-tab-btn:hover {
-    background: #e2e8f0;
-    color: #1e293b;
-}
-
-.cdf-tab-btn.active {
-    background: #3182ce;
-    color: #ffffff;
-}
-
-.notice.is-dismissible {
-    border-left-color: #10b981;
-}
-/* ===========================
-   CDF PLUGIN ADMIN STYLES
-   ============================ */
-
-.form-table th {
+/* Admin Table Customizations inside Cards */
+.cdf-card .form-table th {
+    width: 220px;
     font-weight: 600;
     color: #334155;
-    width: 240px;
 }
 
-.notice.is-dismissible {
-    border-left-color: #10b981;
+.cdf-card .description {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+/* CPT Metabox Custom Styles */
+.cdf-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.cdf-detail-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cdf-detail-card strong {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+.cdf-detail-card span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
 }
