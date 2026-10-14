@@ -1,7 +1,12 @@
-/* ===========================
-   CUSTOM DONATION FORM STYLES
-   ============================ */
+/**
+ * Plugin Name: CDF Donation Form with PayPal and Stripe
+ * Description: Frontend Stylesheet for Version 2.0.0
+ * Author: Razu Ahammad
+ */
 
+/* ===========================
+    CUSTOM DONATION FORM STYLES
+   ============================ */
 
 .styled-donation-container {
     max-width: 550px;
