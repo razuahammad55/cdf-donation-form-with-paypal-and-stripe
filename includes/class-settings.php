@@ -51,11 +51,22 @@ add_action( 'admin_menu', function() {
 });
 
 add_action( 'admin_init', function() {
-    register_setting( 'cdf_api_settings_group', 'cdf_api_settings', 'sanitize_text_field' );
+    register_setting( 'cdf_api_settings_group', 'cdf_api_settings', function( $input ) {
+        if ( ! is_array( $input ) ) {
+            return array();
+        }
+        $sanitized = array();
+        foreach ( $input as $key => $val ) {
+            $sanitized[ sanitize_key( $key ) ] = sanitize_text_field( $val );
+        }
+        return $sanitized;
+    });
+
     register_setting( 'cdf_email_settings_group', 'cdf_admin_email_enabled', 'sanitize_text_field' );
     register_setting( 'cdf_email_settings_group', 'cdf_donor_email_enabled', 'sanitize_text_field' );
     register_setting( 'cdf_email_settings_group', 'cdf_admin_email_recipients', 'sanitize_text_field' );
     register_setting( 'cdf_settings_group', 'cdf_environment', 'sanitize_text_field' );
+    
     register_setting( 'cdf_style_options_group', 'cdf_style_options', function( $input ) {
         if ( ! is_array( $input ) ) {
             return array();
@@ -126,16 +137,6 @@ function cdf_render_forms_page() {
                     <?php submit_button( 'Save Configuration', 'primary', 'cdf_save_forms_config', false ); ?>
                 </div>
             </form>
-        </div>
-
-        <div class="cdf-card">
-            <h3 style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px;">Step-by-Step Setup Guide & Information</h3>
-            <ol style="margin: 0 0 0 20px; color: #334155; line-height: 1.7;">
-                <li><strong>Configure API Keys:</strong> Go to <strong>Donations > Settings</strong> to input your Stripe and PayPal credentials.</li>
-                <li><strong>Environment Mode:</strong> Easily toggle between <strong>Test / Sandbox</strong> and <strong>Live / Production</strong> mode using the switch in Settings.</li>
-                <li><strong>Success & Canceled Pages:</strong> Automated pages for <code>/donation-success/</code> and <code>/donation-canceled/</code> are created upon activation. Ensure your success page contains the <code>[donation_receipt]</code> shortcode.</li>
-                <li><strong>Customize Styling:</strong> Navigate to <strong>Donations > Style</strong> to live-customize button colors, hover states, and global border radius.</li>
-            </ol>
         </div>
     </div>
     <?php
@@ -447,11 +448,10 @@ function cdf_render_settings_page() {
     $env      = get_option( 'cdf_environment', 'sandbox' );
     $settings = get_option( 'cdf_api_settings', array() );
 
-    $stripe_pub_test = isset( $settings['stripe_publishable_test'] ) ? $settings['stripe_publishable_test'] : ( isset( $settings['stripe_publishable'] ) ? $settings['stripe_publishable'] : '' );
-    $stripe_sec_test = isset( $settings['stripe_secret_test'] ) ? $settings['stripe_secret_test'] : ( isset( $settings['stripe_secret'] ) ? $settings['stripe_secret'] : '' );
-    $stripe_pub_live = isset( $settings['stripe_publishable_live'] ) ? $settings['stripe_publishable_live'] : '';
-    $stripe_sec_live = isset( $settings['stripe_secret_live'] ) ? $settings['stripe_secret_live'] : '';
-
+    $stripe_pub_test    = isset( $settings['stripe_publishable_test'] ) ? $settings['stripe_publishable_test'] : ( isset( $settings['stripe_publishable'] ) ? $settings['stripe_publishable'] : '' );
+    $stripe_sec_test    = isset( $settings['stripe_secret_test'] ) ? $settings['stripe_secret_test'] : ( isset( $settings['stripe_secret'] ) ? $settings['stripe_secret'] : '' );
+    $stripe_pub_live    = isset( $settings['stripe_publishable_live'] ) ? $settings['stripe_publishable_live'] : '';
+    $stripe_sec_live    = isset( $settings['stripe_secret_live'] ) ? $settings['stripe_secret_live'] : '';
     $paypal_client_test = isset( $settings['paypal_client_test'] ) ? $settings['paypal_client_test'] : ( isset( $settings['paypal_client'] ) ? $settings['paypal_client'] : '' );
     $paypal_sec_test    = isset( $settings['paypal_secret_test'] ) ? $settings['paypal_secret_test'] : ( isset( $settings['paypal_secret'] ) ? $settings['paypal_secret'] : '' );
     $paypal_client_live = isset( $settings['paypal_client_live'] ) ? $settings['paypal_client_live'] : '';
