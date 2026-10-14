@@ -4,7 +4,8 @@ Donate link: https://github.com/razuahammad55/cdf-donation-form-with-paypal-and-
 Tags: donation, paypal, stripe, fundraising, non-profit
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 1.4.0
+Requires PHP: 7.4
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,13 +25,25 @@ Accept secure payments directly on your website using **Stripe Checkout** (Credi
 - **Automated Receipts & Emails:** Instantly dispatch automated HTML thank-you emails to donors and notification summaries to site administrators.
 - **Custom Post Type Tracking:** Every successful transaction is securely logged as a custom post type (`donation`) complete with metadata like serial numbers, gateway mode, and transaction IDs.
 
+== External Services ==
+
+This plugin connects to external third-party payment gateways to process secure financial donations:
+
+1. **Stripe Checkout & API:** 
+   - **What it is used for:** Processes secure one-time and recurring credit/debit card donations.
+   - **Data sent:** Transmits donation amounts, currency, customer email, names, and checkout metadata via secure server-to-server HTTPS API calls when a user initiates checkout.
+   - **Terms & Privacy:** [Stripe Terms of Service](https://stripe.com/legal/end-users) | [Stripe Privacy Policy](https://stripe.com/privacy).
+
+2. **PayPal REST API & Subscriptions:**
+   - **What it is used for:** Processes secure one-time payments and automated monthly recurring billing agreements.
+   - **Data sent:** Transmits payer names, email addresses, order amounts, and return URLs via secure HTTPS requests.
+   - **Terms & Privacy:** [PayPal Legal Agreements & Privacy](https://www.paypal.com/us/legalhub/home).
 
 == Installation ==
 
 1. Upload the plugin folder `cdf-donation-form-with-paypal-and-stripe` to the `/wp-content/plugins/` directory, or upload the ZIP package through the **Plugins > Add New** screen in WordPress.
-
 2. Activate the plugin through the **Plugins** screen in WordPress.
-3. Upon activation, the plugin automatically creates `/donation-success/` and `/donation-canceled/` pages with required receipt tags.
+3. Upon first activation, the plugin automatically redirects to the Forms setup page and creates required `/donation-success/` and `/donation-canceled/` pages.
 4. Navigate to **Donations > Settings** to configure your environment mode and API keys.
 5. Use the shortcode `[donation_form]` on any page, post, or Elementor widget to display your donation form.
 
@@ -44,23 +57,18 @@ Yes! Use the shortcode `[donation_form type="monthly"]` and ensure your PayPal M
 
 = What shortcodes are available for use? =
 - `[donation_form]` or `[donation_form type="one_time"]` – Renders the one-time donation form.
-
 - `[donation_form type="monthly"]` – Renders the monthly recurring subscription form.
-
 - `[donation_receipt]` – Renders the transaction summary receipt on your success page.
-
 
 = How do I customize the form colors and styles? =
 Go to **Donations > Style** in your WordPress admin dashboard. You can customize colors for Normal, Hover, and Active states across Amount Buttons, Gateway Cards, and Submit Buttons using live color pickers or hex codes, alongside global border radius controls.
 
 = Where can I find my Stripe and PayPal API keys? =
 - **Stripe:** Log into your Stripe Dashboard, go to *Developers > API Keys*, and copy your Publishable Key (`pk_...`) and Secret Key (`sk_...`).
-
 - **PayPal:** Log into the PayPal Developer Portal, create a REST API app under Apps & Credentials, and copy your Client ID and Secret Key.
 
-
 = Can I test transactions before going live? =
-Yes! Under **Donations > Settings**, change your Environment Mode to **Test / Sandbox**. This allows you to test checkout flows using sandbox API keys without making actual charges.
+Yes! Under **Donations > Settings**, change your Environment Mode using the Test / Live toggle switch. This allows you to test checkout flows using sandbox API keys without making actual charges.
 
 = Who do I contact for developer support or bug reports? =
 For developer inquiries, custom extensions, or bug reports, you can reach out directly to the author at razuahammad55@gmail.com.
@@ -82,15 +90,30 @@ For developer inquiries, custom extensions, or bug reports, you can reach out di
 
 == Changelog ==
 
+= 2.0.0 =
+- Released Version 2.0.0 with 100% Plugin Check compliance and zero static analysis warnings.
+- Implemented robust, independent dual-credential storage for Sandbox and Live environment API keys.
+- Enhanced frontend CSS with strict scope isolation (`body .styled-donation-container`) ensuring complete independence from third-party theme interference.
+- Fully refined first-time activation redirect logic and streamlined admin UI panels.
+
+= 1.7.0 =
+- Resolved all static analysis input sanitization warnings across options and custom settings.
+- Restructured admin CSS into dedicated assets/css/admin-style.css and separated frontend CSS assets completely.
+
+= 1.6.0 =
+- Added strict one-time activation redirect check.
+- Added caching environment nonce bypass toggle under Donations > Forms.
+
+= 1.5.0 =
+- Added Requires PHP: 7.4 header for compatibility.
+- Fully documented 3rd-party external API services (Stripe & PayPal) in readme.txt for Guideline 6 compliance.
+
 = 1.4.0 =
-- Fix Text Domain issues
+- Fix Text Domain issues.
 
 = 1.3.0 =
 - Updated plugin title to CDF Donation Form with PayPal and Stripe for Guideline 17 compliance.
 - Added Elementor-style tabbed color controls with hex code support.
-- Enhanced analytics dashboard with a structured multi-gateway revenue breakdown table.
-- Added global border radius geometry settings.
-- Improved frontend form spacing, padding, and responsiveness.
 
 = 1.2.0 =
 - Initial public release supporting Stripe Checkout and PayPal REST API.
