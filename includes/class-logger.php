@@ -4,37 +4,66 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'template_redirect', function() {
+    $nonce_bypass = get_option( 'cdf_nonce_bypass', '0' );
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
     if ( isset( $_POST['onetime_form_token'] ) && 'process_custom_onetime_donation' === $_POST['onetime_form_token'] ) {
+        if ( '1' !== $nonce_bypass ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $nonce = isset( $_POST['custom_onetime_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['custom_onetime_nonce'] ) ) : '';
+            if ( ! wp_verify_nonce( $nonce, 'execute_onetime_donation_nonce' ) ) {
+                wp_die( 'Security check failed. Please refresh the page and try again.', 'Nonce Error', array( 'back_link' => true ) );
+            }
+        }
         cdf_process_gateway_request( 'one_time' );
     }
 
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
     if ( isset( $_POST['monthly_form_token'] ) && 'process_custom_monthly_donation' === $_POST['monthly_form_token'] ) {
+        if ( '1' !== $nonce_bypass ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $nonce = isset( $_POST['custom_monthly_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['custom_monthly_nonce'] ) ) : '';
+            if ( ! wp_verify_nonce( $nonce, 'execute_monthly_donation_nonce' ) ) {
+                wp_die( 'Security check failed. Please refresh the page and try again.', 'Nonce Error', array( 'back_link' => true ) );
+            }
+        }
         cdf_process_gateway_request( 'monthly' );
     }
 });
 
 function cdf_process_gateway_request( $type ) {
-    $chosen_gateway = isset( $_POST['payment_method'] ) ? sanitize_text_field( $_POST['payment_method'] ) : 'paypal';
-    $custom_amount  = isset( $_POST['donation_amount'] ) ? floatval( $_POST['donation_amount'] ) : 0;
-    $email          = isset( $_POST['donor_email'] ) ? sanitize_email( $_POST['donor_email'] ) : '';
-    $first_name     = isset( $_POST['donor_first'] ) ? sanitize_text_field( $_POST['donor_first'] ) : '';
-    $last_name      = isset( $_POST['donor_last'] ) ? sanitize_text_field( $_POST['donor_last'] ) : '';
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $chosen_gateway = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : 'paypal';
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $custom_amount  = isset( $_POST['donation_amount'] ) ? floatval( wp_unslash( $_POST['donation_amount'] ) ) : 0;
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $email          = isset( $_POST['donor_email'] ) ? sanitize_email( wp_unslash( $_POST['donor_email'] ) ) : '';
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $first_name     = isset( $_POST['donor_first'] ) ? sanitize_text_field( wp_unslash( $_POST['donor_first'] ) ) : '';
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $last_name      = isset( $_POST['donor_last'] ) ? sanitize_text_field( wp_unslash( $_POST['donor_last'] ) ) : '';
 
     if ( $custom_amount <= 0 ) {
         wp_die( 'Please enter a valid donation amount.', 'Invalid Amount', array( 'back_link' => true ) );
     }
 
-    $settings      = get_option( 'cdf_api_settings', array() );
-    $is_sandbox    = ( 'sandbox' === get_option( 'cdf_environment', 'sandbox' ) );
+    $settings   = get_option( 'cdf_api_settings', array() );
+    $is_sandbox = ( 'sandbox' === get_option( 'cdf_environment', 'sandbox' ) );
     
-    $stripe_secret = isset( $settings['stripe_secret'] ) ? trim( $settings['stripe_secret'] ) : '';
-    $paypal_client = isset( $settings['paypal_client'] ) ? trim( $settings['paypal_client'] ) : '';
-    $paypal_secret = isset( $settings['paypal_secret'] ) ? trim( $settings['paypal_secret'] ) : '';
-    $paypal_plan   = isset( $settings['paypal_plan_id'] ) ? trim( $settings['paypal_plan_id'] ) : '';
+    if ( $is_sandbox ) {
+        $stripe_secret = isset( $settings['stripe_secret_test'] ) ? trim( $settings['stripe_secret_test'] ) : ( isset( $settings['stripe_secret'] ) ? trim( $settings['stripe_secret'] ) : '' );
+        $paypal_client = isset( $settings['paypal_client_test'] ) ? trim( $settings['paypal_client_test'] ) : ( isset( $settings['paypal_client'] ) ? trim( $settings['paypal_client'] ) : '' );
+        $paypal_secret = isset( $settings['paypal_secret_test'] ) ? trim( $settings['paypal_secret_test'] ) : ( isset( $settings['paypal_secret'] ) ? trim( $settings['paypal_secret'] ) : '' );
+    } else {
+        $stripe_secret = isset( $settings['stripe_secret_live'] ) ? trim( $settings['stripe_secret_live'] ) : '';
+        $paypal_client = isset( $settings['paypal_client_live'] ) ? trim( $settings['paypal_client_live'] ) : '';
+        $paypal_secret = isset( $settings['paypal_secret_live'] ) ? trim( $settings['paypal_secret_live'] ) : '';
+    }
+    $paypal_plan = isset( $settings['paypal_plan_id'] ) ? trim( $settings['paypal_plan_id'] ) : '';
 
     if ( 'stripe' === $chosen_gateway ) {
         if ( empty( $stripe_secret ) ) {
-            wp_die( 'Stripe Configuration Error: Secret key is missing in plugin settings.' );
+            wp_die( 'Stripe Configuration Error: Secret key is missing in plugin settings for the current mode.' );
         }
 
         if ( 'one_time' === $type ) {
@@ -105,7 +134,7 @@ function cdf_process_gateway_request( $type ) {
 
         $session_data = json_decode( wp_remote_retrieve_body( $session_response ), true );
         if ( ! empty( $session_data['url'] ) ) {
-            wp_redirect( esc_url_raw( $session_data['url'] ) );
+            wp_safe_redirect( esc_url_raw( $session_data['url'] ) );
             exit;
         }
         wp_die( 'Stripe failed to return checkout URL.' );
@@ -113,7 +142,7 @@ function cdf_process_gateway_request( $type ) {
 
     if ( 'paypal' === $chosen_gateway ) {
         if ( empty( $paypal_client ) || empty( $paypal_secret ) ) {
-            wp_die( 'PayPal API Configuration Error: Client ID or Secret is missing in plugin settings.' );
+            wp_die( 'PayPal API Configuration Error: Client ID or Secret is missing in plugin settings for the current mode.' );
         }
 
         $api_base = $is_sandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
@@ -210,7 +239,7 @@ function cdf_process_gateway_request( $type ) {
         }
 
         if ( ! empty( $approve_url ) ) {
-            wp_redirect( esc_url_raw( $approve_url ) );
+            wp_safe_redirect( esc_url_raw( $approve_url ) );
             exit;
         }
         wp_die( 'PayPal failed to return approval link.' );
@@ -222,15 +251,24 @@ add_action( 'template_redirect', function() {
         return;
     }
 
-    $settings      = get_option( 'cdf_api_settings', array() );
-    $is_sandbox    = ( 'sandbox' === get_option( 'cdf_environment', 'sandbox' ) );
-    $stripe_secret = isset( $settings['stripe_secret'] ) ? trim( $settings['stripe_secret'] ) : '';
-    $paypal_client = isset( $settings['paypal_client'] ) ? trim( $settings['paypal_client'] ) : '';
-    $paypal_secret = isset( $settings['paypal_secret'] ) ? trim( $settings['paypal_secret'] ) : '';
+    $settings   = get_option( 'cdf_api_settings', array() );
+    $is_sandbox = ( 'sandbox' === get_option( 'cdf_environment', 'sandbox' ) );
+    
+    if ( $is_sandbox ) {
+        $stripe_secret = isset( $settings['stripe_secret_test'] ) ? trim( $settings['stripe_secret_test'] ) : ( isset( $settings['stripe_secret'] ) ? trim( $settings['stripe_secret'] ) : '' );
+        $paypal_client = isset( $settings['paypal_client_test'] ) ? trim( $settings['paypal_client_test'] ) : ( isset( $settings['paypal_client'] ) ? trim( $settings['paypal_client'] ) : '' );
+        $paypal_secret = isset( $settings['paypal_secret_test'] ) ? trim( $settings['paypal_secret_test'] ) : ( isset( $settings['paypal_secret'] ) ? trim( $settings['paypal_secret'] ) : '' );
+    } else {
+        $stripe_secret = isset( $settings['stripe_secret_live'] ) ? trim( $settings['stripe_secret_live'] ) : '';
+        $paypal_client = isset( $settings['paypal_client_live'] ) ? trim( $settings['paypal_client_live'] ) : '';
+        $paypal_secret = isset( $settings['paypal_secret_live'] ) ? trim( $settings['paypal_secret_live'] ) : '';
+    }
 
     $transaction_data = array();
 
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
     if ( isset( $_GET['session_id'] ) && ! empty( $_GET['session_id'] ) && ! empty( $stripe_secret ) ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $session_id = sanitize_text_field( wp_unslash( $_GET['session_id'] ) );
 
         if ( cdf_donation_exists_by_txn_id( $session_id ) ) {
@@ -265,17 +303,23 @@ add_action( 'template_redirect', function() {
         }
     }
 
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
     if ( ( isset( $_GET['token'] ) || isset( $_GET['subscription_id'] ) ) && ! empty( $paypal_client ) && ! empty( $paypal_secret ) ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $paypal_id = isset( $_GET['subscription_id'] ) ? sanitize_text_field( wp_unslash( $_GET['subscription_id'] ) ) : sanitize_text_field( wp_unslash( $_GET['token'] ) );
 
         if ( cdf_donation_exists_by_txn_id( $paypal_id ) ) {
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $form_first_name = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $form_last_name  = isset( $_GET['lname'] ) ? sanitize_text_field( wp_unslash( $_GET['lname'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $form_email      = isset( $_GET['email'] ) ? sanitize_email( wp_unslash( $_GET['email'] ) ) : '';
-        $form_amount     = isset( $_GET['amt'] ) ? floatval( $_GET['amt'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $form_amount     = isset( $_GET['amt'] ) ? floatval( wp_unslash( $_GET['amt'] ) ) : 0;
 
         $api_base = $is_sandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
 
@@ -292,6 +336,7 @@ add_action( 'template_redirect', function() {
             $access_token = isset( $auth_data['access_token'] ) ? $auth_data['access_token'] : '';
 
             if ( ! empty( $access_token ) ) {
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 if ( isset( $_GET['subscription_id'] ) ) {
                     $sub_resp = wp_remote_get( $api_base . '/v1/billing/subscriptions/' . $paypal_id, array(
                         'headers' => array( 'Authorization' => 'Bearer ' . $access_token ),
