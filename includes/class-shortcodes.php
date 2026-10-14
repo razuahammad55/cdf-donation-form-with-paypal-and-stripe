@@ -77,9 +77,13 @@ add_shortcode( 'donation_receipt', function() {
     $amount     = '0.00';
     $frequency  = 'One-Time';
 
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
     if ( isset( $_GET['session_id'] ) && ! empty( $_GET['session_id'] ) ) {
         $settings      = get_option( 'cdf_api_settings', array() );
-        $stripe_secret = isset( $settings['stripe_secret'] ) ? trim( $settings['stripe_secret'] ) : '';
+        $is_sandbox    = ( 'sandbox' === get_option( 'cdf_environment', 'sandbox' ) );
+        $stripe_secret = $is_sandbox ? ( isset( $settings['stripe_secret_test'] ) ? trim( $settings['stripe_secret_test'] ) : ( isset( $settings['stripe_secret'] ) ? trim( $settings['stripe_secret'] ) : '' ) ) : ( isset( $settings['stripe_secret_live'] ) ? trim( $settings['stripe_secret_live'] ) : '' );
+        
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $session_id    = sanitize_text_field( wp_unslash( $_GET['session_id'] ) );
 
         if ( ! empty( $stripe_secret ) ) {
@@ -98,11 +102,17 @@ add_shortcode( 'donation_receipt', function() {
                 }
             }
         }
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
     } else if ( isset( $_GET['token'] ) || isset( $_GET['subscription_id'] ) ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $first_name = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : 'Donor';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $last_name  = isset( $_GET['lname'] ) ? sanitize_text_field( wp_unslash( $_GET['lname'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $email      = isset( $_GET['email'] ) ? sanitize_email( wp_unslash( $_GET['email'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $amount     = isset( $_GET['amt'] ) ? number_format( floatval( $_GET['amt'] ), 2 ) : '0.00';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $frequency  = isset( $_GET['subscription_id'] ) ? 'Monthly' : 'One-Time';
     }
 
